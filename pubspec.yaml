@@ -1,4 +1,4 @@
-name: inspection_report_generator
+name: move_in_move_out_inspection
 description: No portal login. Create move-in, move-out, HVAC & property PDF reports.
 publish_to: 'none'
 version: 1.0.0+1
