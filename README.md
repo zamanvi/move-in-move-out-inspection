@@ -1,6 +1,6 @@
-# Inspection Report Generator
+# Move In Move Out Inspection
 
-Flutter app: create home, rental, HVAC & property inspection PDF reports on-site, fully offline, no web portal or account required.
+Flutter app: create move-in, move-out, HVAC & property inspection PDF reports on-site, fully offline, no web portal or account required.
 
 ## What's in this repo
 
@@ -27,8 +27,8 @@ Flutter app: create home, rental, HVAC & property inspection PDF reports on-site
 
 ## Store listing copy (already drafted)
 
-- **Title:** Inspection Report Generator (27 chars)
-- **Short description:** Free inspection PDF reports for property, HVAC & equipment - no portal login. (77 chars)
+- **Title:** Move In Move Out Inspection (27 chars) — chosen over the more generic "Inspection Report Generator" because it targets a lower-competition, long-tail keyword for faster initial ranking. The app itself still covers HVAC, roof, and electrical checklists too.
+- **Short description:** No portal login. Create move-in, move-out, HVAC & property PDF reports. (71 chars)
 - **Long description:** see prior conversation — covers key features, target trades, and free-to-start positioning.
 
 ## Monetization

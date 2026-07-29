@@ -15,7 +15,7 @@ class InspectionApp extends StatelessWidget {
   Widget build(BuildContext context) {
     const seed = Color(0xFF2E5266);
     return MaterialApp(
-      title: 'Inspection Report Generator',
+      title: 'Move In Move Out Inspection',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: seed),

@@ -19,6 +19,7 @@ jobs:
         run: |
           flutter create --platforms=android --org com.tensai --project-name inspection_report_generator /tmp/scaffold
           cp -r /tmp/scaffold/android ./android
+          sed -i 's/android:label="[^"]*"/android:label="Move In Move Out Inspection"/' android/app/src/main/AndroidManifest.xml
 
       - name: Install dependencies
         run: flutter pub get

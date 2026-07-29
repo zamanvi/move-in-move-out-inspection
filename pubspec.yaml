@@ -1,5 +1,5 @@
 name: inspection_report_generator
-description: Create home, rental, HVAC & property inspection PDF reports on-site.
+description: No portal login. Create move-in, move-out, HVAC & property PDF reports.
 publish_to: 'none'
 version: 1.0.0+1
 
