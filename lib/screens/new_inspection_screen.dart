@@ -24,6 +24,13 @@ class _NewInspectionScreenState extends State<NewInspectionScreen> {
     if (_templates.isNotEmpty) _selected = _templates.first;
   }
 
+  @override
+  void dispose() {
+    _clientController.dispose();
+    _addressController.dispose();
+    super.dispose();
+  }
+
   void _start() {
     if (_selected == null) return;
     final inspection = Inspection(

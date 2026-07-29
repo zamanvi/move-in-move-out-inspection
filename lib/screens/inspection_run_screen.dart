@@ -17,12 +17,23 @@ class InspectionRunScreen extends StatefulWidget {
 
 class _InspectionRunScreenState extends State<InspectionRunScreen> {
   late Inspection _inspection;
+  late List<TextEditingController> _noteControllers;
   bool _generating = false;
 
   @override
   void initState() {
     super.initState();
     _inspection = widget.inspection;
+    _noteControllers =
+        _inspection.items.map((item) => TextEditingController(text: item.note)).toList();
+  }
+
+  @override
+  void dispose() {
+    for (final c in _noteControllers) {
+      c.dispose();
+    }
+    super.dispose();
   }
 
   Future<void> _persist() => StorageService.saveInspection(_inspection);
@@ -115,7 +126,7 @@ class _InspectionRunScreenState extends State<InspectionRunScreen> {
                     ),
                     TextField(
                       decoration: const InputDecoration(hintText: 'Note (optional)'),
-                      controller: TextEditingController(text: _inspection.items[i].note),
+                      controller: _noteControllers[i],
                       onChanged: (v) => _inspection.items[i].note = v,
                       onEditingComplete: _persist,
                     ),

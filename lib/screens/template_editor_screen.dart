@@ -21,6 +21,15 @@ class _TemplateEditorScreenState extends State<TemplateEditorScreen> {
     _itemControllers = widget.template.items.map((e) => TextEditingController(text: e)).toList();
   }
 
+  @override
+  void dispose() {
+    _nameController.dispose();
+    for (final c in _itemControllers) {
+      c.dispose();
+    }
+    super.dispose();
+  }
+
   void _addItem() => setState(() => _itemControllers.add(TextEditingController()));
 
   void _removeItem(int index) => setState(() => _itemControllers.removeAt(index));

@@ -26,6 +26,14 @@ class _BrandingSettingsScreenState extends State<BrandingSettingsScreen> {
     _termsController = TextEditingController(text: _branding.terms);
   }
 
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _contactController.dispose();
+    _termsController.dispose();
+    super.dispose();
+  }
+
   Future<void> _pickLogo() async {
     final picked = await ImagePicker().pickImage(source: ImageSource.gallery, imageQuality: 90);
     if (picked != null) setState(() => _branding.logoPath = picked.path);
