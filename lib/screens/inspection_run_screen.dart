@@ -90,14 +90,18 @@ class _InspectionRunScreenState extends State<InspectionRunScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final subtitleParts = [_inspection.clientName, _inspection.propertyAddress]
+        .where((s) => s.isNotEmpty)
+        .join(' · ');
     return Scaffold(
       appBar: AppBar(title: Text(_inspection.templateName)),
       body: ListView(
         padding: const EdgeInsets.all(12),
         children: [
-          Text('${_inspection.clientName} · ${_inspection.propertyAddress}',
-              style: const TextStyle(color: Colors.grey)),
-          const SizedBox(height: 12),
+          if (subtitleParts.isNotEmpty) ...[
+            Text(subtitleParts, style: const TextStyle(color: Colors.grey)),
+            const SizedBox(height: 12),
+          ],
           for (int i = 0; i < _inspection.items.length; i++)
             Card(
               margin: const EdgeInsets.symmetric(vertical: 4),

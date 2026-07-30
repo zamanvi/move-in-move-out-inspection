@@ -3,6 +3,7 @@ import 'package:uuid/uuid.dart';
 import '../models/models.dart';
 import '../services/storage_service.dart';
 import 'inspection_run_screen.dart';
+import 'templates_screen.dart';
 
 class NewInspectionScreen extends StatefulWidget {
   const NewInspectionScreen({super.key});
@@ -47,8 +48,45 @@ class _NewInspectionScreenState extends State<NewInspectionScreen> {
     );
   }
 
+  Future<void> _createFirstTemplate() async {
+    await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const TemplatesScreen()),
+    );
+    setState(() {
+      _templates = StorageService.getTemplates();
+      if (_templates.isNotEmpty) _selected = _templates.first;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
+    if (_templates.isEmpty) {
+      return Scaffold(
+        appBar: AppBar(title: const Text('New Inspection')),
+        body: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Text(
+                  'No checklists yet.\nCreate one to start an inspection.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 16, color: Colors.grey),
+                ),
+                const SizedBox(height: 16),
+                FilledButton.icon(
+                  onPressed: _createFirstTemplate,
+                  icon: const Icon(Icons.add),
+                  label: const Text('Create Checklist'),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
     return Scaffold(
       appBar: AppBar(title: const Text('New Inspection')),
       body: ListView(

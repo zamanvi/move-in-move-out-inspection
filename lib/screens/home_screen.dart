@@ -27,6 +27,8 @@ class _HomeScreenState extends State<HomeScreen> {
     setState(() => _inspections = StorageService.getInspections());
   }
 
+  int _failCount(Inspection i) => i.items.where((item) => item.status == ItemStatus.fail).length;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -71,19 +73,61 @@ class _HomeScreenState extends State<HomeScreen> {
               itemCount: _inspections.length,
               itemBuilder: (context, index) {
                 final i = _inspections[index];
-                return ListTile(
-                  leading: const Icon(Icons.description_outlined),
-                  title: Text(i.templateName),
-                  subtitle: Text(
-                    '${i.clientName.isEmpty ? i.propertyAddress : i.clientName} · ${DateFormat.yMMMd().format(i.date)}',
+                final label = i.clientName.isEmpty ? i.propertyAddress : i.clientName;
+                return Dismissible(
+                  key: ValueKey(i.id),
+                  direction: DismissDirection.endToStart,
+                  background: Container(
+                    color: Colors.red,
+                    alignment: Alignment.centerRight,
+                    padding: const EdgeInsets.only(right: 20),
+                    child: const Icon(Icons.delete, color: Colors.white),
                   ),
-                  onTap: () async {
-                    await Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (_) => InspectionRunScreen(inspection: i)),
-                    );
+                  confirmDismiss: (_) => showDialog<bool>(
+                    context: context,
+                    builder: (ctx) => AlertDialog(
+                      title: const Text('Delete inspection?'),
+                      content: const Text('This report will be permanently deleted.'),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.pop(ctx, false),
+                          child: const Text('Cancel'),
+                        ),
+                        TextButton(
+                          onPressed: () => Navigator.pop(ctx, true),
+                          child: const Text('Delete'),
+                        ),
+                      ],
+                    ),
+                  ),
+                  onDismissed: (_) async {
+                    await StorageService.deleteInspection(i.id);
                     _refresh();
                   },
+                  child: ListTile(
+                    leading: const Icon(Icons.description_outlined),
+                    title: Text(i.templateName),
+                    subtitle: Text(
+                      label.isEmpty
+                          ? DateFormat.yMMMd().format(i.date)
+                          : '$label · ${DateFormat.yMMMd().format(i.date)}',
+                    ),
+                    trailing: _failCount(i) > 0
+                        ? Chip(
+                            label: Text('${_failCount(i)} failed'),
+                            backgroundColor: Colors.red.shade50,
+                            labelStyle: TextStyle(color: Colors.red.shade700, fontSize: 12),
+                            visualDensity: VisualDensity.compact,
+                          )
+                        : null,
+                    onTap: () async {
+                      await Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => InspectionRunScreen(inspection: i)),
+                      );
+                      _refresh();
+                    },
+                  ),
                 );
               },
             ),

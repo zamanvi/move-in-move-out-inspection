@@ -36,8 +36,27 @@ class _TemplatesScreenState extends State<TemplatesScreen> {
             trailing: IconButton(
               icon: const Icon(Icons.delete_outline),
               onPressed: () async {
-                await StorageService.deleteTemplate(t.id);
-                _refresh();
+                final confirmed = await showDialog<bool>(
+                  context: context,
+                  builder: (ctx) => AlertDialog(
+                    title: const Text('Delete checklist?'),
+                    content: Text('"${t.name}" will be permanently deleted.'),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(ctx, false),
+                        child: const Text('Cancel'),
+                      ),
+                      TextButton(
+                        onPressed: () => Navigator.pop(ctx, true),
+                        child: const Text('Delete'),
+                      ),
+                    ],
+                  ),
+                );
+                if (confirmed == true) {
+                  await StorageService.deleteTemplate(t.id);
+                  _refresh();
+                }
               },
             ),
             onTap: () async {
