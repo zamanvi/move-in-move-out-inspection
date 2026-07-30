@@ -103,12 +103,18 @@ class _NewInspectionScreenState extends State<NewInspectionScreen> {
           const SizedBox(height: 16),
           TextField(
             controller: _clientController,
-            decoration: const InputDecoration(labelText: 'Client Name'),
+            decoration: const InputDecoration(
+              labelText: 'Client Name',
+              hintText: 'e.g. John Smith',
+            ),
           ),
           const SizedBox(height: 16),
           TextField(
             controller: _addressController,
-            decoration: const InputDecoration(labelText: 'Property Address'),
+            decoration: const InputDecoration(
+              labelText: 'Property Address',
+              hintText: 'e.g. 123 Main St, Springfield',
+            ),
           ),
           const SizedBox(height: 24),
           FilledButton(

@@ -56,7 +56,10 @@ class _TemplateEditorScreenState extends State<TemplateEditorScreen> {
         children: [
           TextField(
             controller: _nameController,
-            decoration: const InputDecoration(labelText: 'Checklist Name'),
+            decoration: const InputDecoration(
+              labelText: 'Checklist Name',
+              hintText: 'e.g. Move-In Inspection',
+            ),
           ),
           const SizedBox(height: 16),
           const Text('Items', style: TextStyle(fontWeight: FontWeight.bold)),
@@ -68,7 +71,7 @@ class _TemplateEditorScreenState extends State<TemplateEditorScreen> {
                   Expanded(
                     child: TextField(
                       controller: _itemControllers[i],
-                      decoration: InputDecoration(hintText: 'Item ${i + 1}'),
+                      decoration: InputDecoration(hintText: 'e.g. Check smoke detector'),
                     ),
                   ),
                   IconButton(

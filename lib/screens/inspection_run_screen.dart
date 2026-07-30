@@ -129,7 +129,7 @@ class _InspectionRunScreenState extends State<InspectionRunScreen> {
                       }).toList(),
                     ),
                     TextField(
-                      decoration: const InputDecoration(hintText: 'Note (optional)'),
+                      decoration: const InputDecoration(hintText: 'Add a note (optional)'),
                       controller: _noteControllers[i],
                       onChanged: (v) => _inspection.items[i].note = v,
                       onEditingComplete: _persist,
