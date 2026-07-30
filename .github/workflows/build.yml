@@ -17,8 +17,7 @@ jobs:
 
       - name: Generate native Android project
         run: |
-          flutter create --platforms=android --org com.tensai --project-name move_in_move_out_inspection /tmp/scaffold
-          cp -r /tmp/scaffold/android ./android
+          flutter create --platforms=android --org com.tensai --project-name move_in_move_out_inspection .
           sed -i 's/android:label="[^"]*"/android:label="Move In Move Out Inspection"/' android/app/src/main/AndroidManifest.xml
           # The printing plugin requires compileSdk/targetSdk >= 33; force a modern SDK
           # regardless of whatever flutter.compileSdkVersion the generator defaulted to.
