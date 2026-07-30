@@ -86,10 +86,6 @@ class InspectionApp extends StatelessWidget {
             textStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
           ),
         ),
-        chipTheme: ChipThemeData(
-          labelStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 12),
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-        ),
       ),
       home: const HomeScreen(),
     );
