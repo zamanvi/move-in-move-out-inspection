@@ -56,14 +56,17 @@ jobs:
 
       - name: Build APK (sideload / manual testing)
         run: |
-          # flutter_tools has a known bug where Gradle succeeds but the tool
-          # itself fails to locate its own output ("Already watching path" /
-          # "couldn't find it"). Don't trust its exit code — search the
-          # filesystem directly for what Gradle actually produced.
+          echo "--- pwd/ls before build ---"
+          pwd
+          ls -la
           flutter build apk --release || true
-          APK=$(find build -name "*.apk" | head -1)
+          echo "--- pwd/ls after build ---"
+          ls -la
+          echo "--- searching whole filesystem for any .apk ---"
+          APK=$(find / -xdev -iname "*.apk" 2>/dev/null | grep -v '/root/.gradle\|/opt/hostedtoolcache' | head -1)
           if [ -z "$APK" ]; then
-            echo "No .apk file found anywhere under build/ - the build genuinely failed."
+            echo "No .apk file found anywhere on disk - the build genuinely failed."
+            find / -xdev -iname "*.apk" 2>/dev/null | head -20
             exit 1
           fi
           echo "Found APK at: $APK"
@@ -73,9 +76,10 @@ jobs:
       - name: Build App Bundle (Play Store upload)
         run: |
           flutter build appbundle --release || true
-          AAB=$(find build -name "*.aab" | head -1)
+          AAB=$(find / -xdev -iname "*.aab" 2>/dev/null | grep -v '/root/.gradle\|/opt/hostedtoolcache' | head -1)
           if [ -z "$AAB" ]; then
-            echo "No .aab file found anywhere under build/ - the build genuinely failed."
+            echo "No .aab file found anywhere on disk - the build genuinely failed."
+            find / -xdev -iname "*.aab" 2>/dev/null | head -20
             exit 1
           fi
           echo "Found AAB at: $AAB"
