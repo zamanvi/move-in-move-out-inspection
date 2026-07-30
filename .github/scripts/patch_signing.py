@@ -9,12 +9,16 @@ is_kts = gradle_file.suffix == ".kts"
 text = gradle_file.read_text()
 
 if is_kts:
+    import_lines = "import java.util.Properties\nimport java.io.FileInputStream\n\n"
+    if "import java.util.Properties" not in text:
+        text = import_lines + text
+
     props_block = (
         "\n"
-        "    val keystoreProperties = java.util.Properties()\n"
+        "    val keystoreProperties = Properties()\n"
         "    val keystorePropertiesFile = rootProject.file(\"key.properties\")\n"
         "    if (keystorePropertiesFile.exists()) {\n"
-        "        keystoreProperties.load(java.io.FileInputStream(keystorePropertiesFile))\n"
+        "        keystoreProperties.load(FileInputStream(keystorePropertiesFile))\n"
         "    }\n"
     )
     signing_block = (
