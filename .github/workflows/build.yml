@@ -20,6 +20,19 @@ jobs:
           flutter create --platforms=android --org com.tensai --project-name move_in_move_out_inspection /tmp/scaffold
           cp -r /tmp/scaffold/android ./android
           sed -i 's/android:label="[^"]*"/android:label="Move In Move Out Inspection"/' android/app/src/main/AndroidManifest.xml
+          # The printing plugin requires compileSdk/targetSdk >= 33; force a modern SDK
+          # regardless of whatever flutter.compileSdkVersion the generator defaulted to.
+          # Handles both Groovy (build.gradle) and Kotlin DSL (build.gradle.kts) templates.
+          GRADLE_FILE=android/app/build.gradle
+          [ -f android/app/build.gradle.kts ] && GRADLE_FILE=android/app/build.gradle.kts
+          sed -i \
+            -e 's/compileSdkVersion flutter.compileSdkVersion/compileSdkVersion 35/' \
+            -e 's/compileSdk = flutter.compileSdkVersion/compileSdk = 35/' \
+            -e 's/compileSdk flutter.compileSdkVersion/compileSdk 35/' \
+            -e 's/targetSdkVersion flutter.targetSdkVersion/targetSdkVersion 35/' \
+            -e 's/targetSdk = flutter.targetSdkVersion/targetSdk = 35/' \
+            -e 's/targetSdk flutter.targetSdkVersion/targetSdk 35/' \
+            "$GRADLE_FILE"
 
       - name: Install dependencies
         run: flutter pub get
