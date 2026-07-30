@@ -33,6 +33,20 @@ jobs:
             -e 's/targetSdk = flutter.targetSdkVersion/targetSdk = 36/' \
             -e 's/targetSdk flutter.targetSdkVersion/targetSdk 36/' \
             "$GRADLE_FILE"
+          # Some plugins (e.g. printing) bundle their own Android subproject with an
+          # older hardcoded compileSdk. Force every plugin subproject to 36 too.
+          cat >> android/build.gradle <<'EOF'
+
+subprojects {
+    afterEvaluate { proj ->
+        if (proj.hasProperty("android")) {
+            proj.android {
+                compileSdkVersion 36
+            }
+        }
+    }
+}
+EOF
 
       - name: Install dependencies
         run: flutter pub get
