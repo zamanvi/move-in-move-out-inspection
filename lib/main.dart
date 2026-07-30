@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'services/storage_service.dart';
 import 'screens/home_screen.dart';
 
+final RouteObserver<PageRoute> routeObserver = RouteObserver<PageRoute>();
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await StorageService.init();
@@ -19,6 +21,7 @@ class InspectionApp extends StatelessWidget {
     return MaterialApp(
       title: 'Move In Move Out Inspection',
       debugShowCheckedModeBanner: false,
+      navigatorObservers: [routeObserver],
       theme: ThemeData(
         colorScheme: colorScheme,
         useMaterial3: true,

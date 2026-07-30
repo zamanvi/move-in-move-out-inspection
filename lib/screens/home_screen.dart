@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import '../main.dart';
 import '../models/models.dart';
 import '../services/storage_service.dart';
 import 'new_inspection_screen.dart';
@@ -14,12 +15,33 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _HomeScreenState extends State<HomeScreen> with RouteAware {
   List<Inspection> _inspections = [];
 
   @override
   void initState() {
     super.initState();
+    _refresh();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    routeObserver.subscribe(this, ModalRoute.of(context) as PageRoute);
+  }
+
+  @override
+  void dispose() {
+    routeObserver.unsubscribe(this);
+    super.dispose();
+  }
+
+  // Called every time this screen becomes visible again after a nested
+  // route pops - covers pushReplacement chains (New Inspection -> Run
+  // Inspection) where a single awaited Navigator.push in this screen
+  // would otherwise resolve too early and miss the freshly saved report.
+  @override
+  void didPopNext() {
     _refresh();
   }
 
