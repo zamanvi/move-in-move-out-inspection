@@ -26,12 +26,12 @@ jobs:
           GRADLE_FILE=android/app/build.gradle
           [ -f android/app/build.gradle.kts ] && GRADLE_FILE=android/app/build.gradle.kts
           sed -i \
-            -e 's/compileSdkVersion flutter.compileSdkVersion/compileSdkVersion 35/' \
-            -e 's/compileSdk = flutter.compileSdkVersion/compileSdk = 35/' \
-            -e 's/compileSdk flutter.compileSdkVersion/compileSdk 35/' \
-            -e 's/targetSdkVersion flutter.targetSdkVersion/targetSdkVersion 35/' \
-            -e 's/targetSdk = flutter.targetSdkVersion/targetSdk = 35/' \
-            -e 's/targetSdk flutter.targetSdkVersion/targetSdk 35/' \
+            -e 's/compileSdkVersion flutter.compileSdkVersion/compileSdkVersion 36/' \
+            -e 's/compileSdk = flutter.compileSdkVersion/compileSdk = 36/' \
+            -e 's/compileSdk flutter.compileSdkVersion/compileSdk 36/' \
+            -e 's/targetSdkVersion flutter.targetSdkVersion/targetSdkVersion 36/' \
+            -e 's/targetSdk = flutter.targetSdkVersion/targetSdk = 36/' \
+            -e 's/targetSdk flutter.targetSdkVersion/targetSdk 36/' \
             "$GRADLE_FILE"
 
       - name: Install dependencies
