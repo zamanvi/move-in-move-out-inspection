@@ -17,7 +17,7 @@ jobs:
 
       - name: Generate native Android project
         run: |
-          flutter create --platforms=android --org com.tensai --project-name move_in_move_out_inspection .
+          flutter create --platforms=android --org com.zamanvi --project-name move_in_move_out_inspection .
           sed -i 's/android:label="[^"]*"/android:label="Move In Move Out Inspection"/' android/app/src/main/AndroidManifest.xml
           # The printing plugin requires compileSdk/targetSdk >= 33; force a modern SDK
           # regardless of whatever flutter.compileSdkVersion the generator defaulted to.
@@ -50,6 +50,18 @@ jobs:
           # path" and the build silently fails to report its own output file.
           # https://github.com/gradle/gradle/issues/27940
           printf '%s\n' 'org.gradle.configuration-cache=false' >> android/gradle.properties
+
+      - name: Configure release signing
+        env:
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+          KEYSTORE_STORE_PASSWORD: ${{ secrets.KEYSTORE_STORE_PASSWORD }}
+          KEYSTORE_KEY_PASSWORD: ${{ secrets.KEYSTORE_KEY_PASSWORD }}
+          KEYSTORE_KEY_ALIAS: ${{ secrets.KEYSTORE_KEY_ALIAS }}
+        run: |
+          echo "$KEYSTORE_BASE64" | base64 -d > android/upload-keystore.jks
+          printf 'storePassword=%s\nkeyPassword=%s\nkeyAlias=%s\nstoreFile=upload-keystore.jks\n' \
+            "$KEYSTORE_STORE_PASSWORD" "$KEYSTORE_KEY_PASSWORD" "$KEYSTORE_KEY_ALIAS" > android/key.properties
+          python3 .github/scripts/patch_signing.py
 
       - name: Install dependencies
         run: flutter pub get
