@@ -45,6 +45,11 @@ jobs:
             '        }' \
             '    }' \
             '}' >> android/build.gradle
+          # Gradle's configuration cache has a known bug with the symlinked
+          # $GITHUB_WORKSPACE path on hosted runners: it throws "Already watching
+          # path" and the build silently fails to report its own output file.
+          # https://github.com/gradle/gradle/issues/27940
+          printf '%s\n' 'org.gradle.configuration-cache=false' >> android/gradle.properties
 
       - name: Install dependencies
         run: flutter pub get
