@@ -55,10 +55,32 @@ jobs:
         run: flutter pub get
 
       - name: Build APK (sideload / manual testing)
-        run: flutter build apk --release
+        run: |
+          # flutter_tools has a known bug where Gradle succeeds but the tool
+          # itself fails to locate its own output ("Already watching path" /
+          # "couldn't find it"). Don't trust its exit code — search the
+          # filesystem directly for what Gradle actually produced.
+          flutter build apk --release || true
+          APK=$(find build -name "*.apk" | head -1)
+          if [ -z "$APK" ]; then
+            echo "No .apk file found anywhere under build/ - the build genuinely failed."
+            exit 1
+          fi
+          echo "Found APK at: $APK"
+          mkdir -p build/app/outputs/flutter-apk
+          cp "$APK" build/app/outputs/flutter-apk/app-release.apk
 
       - name: Build App Bundle (Play Store upload)
-        run: flutter build appbundle --release
+        run: |
+          flutter build appbundle --release || true
+          AAB=$(find build -name "*.aab" | head -1)
+          if [ -z "$AAB" ]; then
+            echo "No .aab file found anywhere under build/ - the build genuinely failed."
+            exit 1
+          fi
+          echo "Found AAB at: $AAB"
+          mkdir -p build/app/outputs/bundle/release
+          cp "$AAB" build/app/outputs/bundle/release/app-release.aab
 
       - uses: actions/upload-artifact@v4
         with:
