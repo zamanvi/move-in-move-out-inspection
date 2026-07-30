@@ -31,12 +31,13 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Scaffold(
       appBar: AppBar(
         title: const Text('Inspection Reports'),
         actions: [
           IconButton(
-            icon: const Icon(Icons.checklist),
+            icon: const Icon(Icons.checklist_rounded),
             tooltip: 'Checklist Templates',
             onPressed: () async {
               await Navigator.push(
@@ -47,7 +48,7 @@ class _HomeScreenState extends State<HomeScreen> {
             },
           ),
           IconButton(
-            icon: const Icon(Icons.settings),
+            icon: const Icon(Icons.settings_outlined),
             tooltip: 'Company Branding',
             onPressed: () {
               Navigator.push(
@@ -56,32 +57,62 @@ class _HomeScreenState extends State<HomeScreen> {
               );
             },
           ),
+          const SizedBox(width: 4),
         ],
       ),
       body: _inspections.isEmpty
-          ? const Center(
+          ? Center(
               child: Padding(
-                padding: EdgeInsets.all(24),
-                child: Text(
-                  'No inspections yet.\nTap + to start your first report.',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 16, color: Colors.grey),
+                padding: const EdgeInsets.all(32),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      width: 88,
+                      height: 88,
+                      decoration: BoxDecoration(
+                        color: colorScheme.primary.withOpacity(0.08),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(Icons.fact_check_outlined, size: 44, color: colorScheme.primary),
+                    ),
+                    const SizedBox(height: 20),
+                    Text(
+                      'No inspections yet',
+                      style: Theme.of(context)
+                          .textTheme
+                          .titleLarge
+                          ?.copyWith(color: Colors.grey.shade800),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      'Tap "New Inspection" below to create\nyour first report.',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(fontSize: 14, color: Colors.grey.shade500, height: 1.4),
+                    ),
+                  ],
                 ),
               ),
             )
           : ListView.builder(
+              padding: const EdgeInsets.fromLTRB(12, 12, 12, 96),
               itemCount: _inspections.length,
               itemBuilder: (context, index) {
                 final i = _inspections[index];
                 final label = i.clientName.isEmpty ? i.propertyAddress : i.clientName;
+                final fails = _failCount(i);
                 return Dismissible(
                   key: ValueKey(i.id),
                   direction: DismissDirection.endToStart,
                   background: Container(
-                    color: Colors.red,
+                    margin: const EdgeInsets.symmetric(vertical: 6),
+                    decoration: BoxDecoration(
+                      color: Colors.red.shade400,
+                      borderRadius: BorderRadius.circular(14),
+                    ),
                     alignment: Alignment.centerRight,
                     padding: const EdgeInsets.only(right: 20),
-                    child: const Icon(Icons.delete, color: Colors.white),
+                    child: const Icon(Icons.delete_outline, color: Colors.white),
                   ),
                   confirmDismiss: (_) => showDialog<bool>(
                     context: context,
@@ -104,29 +135,71 @@ class _HomeScreenState extends State<HomeScreen> {
                     await StorageService.deleteInspection(i.id);
                     _refresh();
                   },
-                  child: ListTile(
-                    leading: const Icon(Icons.description_outlined),
-                    title: Text(i.templateName),
-                    subtitle: Text(
-                      label.isEmpty
-                          ? DateFormat.yMMMd().format(i.date)
-                          : '$label · ${DateFormat.yMMMd().format(i.date)}',
+                  child: Card(
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(14),
+                      onTap: () async {
+                        await Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (_) => InspectionRunScreen(inspection: i)),
+                        );
+                        _refresh();
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.all(14),
+                        child: Row(
+                          children: [
+                            Container(
+                              width: 44,
+                              height: 44,
+                              decoration: BoxDecoration(
+                                color: colorScheme.primary.withOpacity(0.08),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Icon(Icons.description_outlined,
+                                  color: colorScheme.primary, size: 22),
+                            ),
+                            const SizedBox(width: 14),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(i.templateName,
+                                      style: Theme.of(context).textTheme.titleMedium),
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    label.isEmpty
+                                        ? DateFormat.yMMMd().format(i.date)
+                                        : '$label · ${DateFormat.yMMMd().format(i.date)}',
+                                    style: TextStyle(fontSize: 13, color: Colors.grey.shade500),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ],
+                              ),
+                            ),
+                            if (fails > 0) ...[
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                decoration: BoxDecoration(
+                                  color: Colors.red.shade50,
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                                child: Text(
+                                  '$fails failed',
+                                  style: TextStyle(
+                                    color: Colors.red.shade700,
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 6),
+                            ],
+                            Icon(Icons.chevron_right, color: Colors.grey.shade400),
+                          ],
+                        ),
+                      ),
                     ),
-                    trailing: _failCount(i) > 0
-                        ? Chip(
-                            label: Text('${_failCount(i)} failed'),
-                            backgroundColor: Colors.red.shade50,
-                            labelStyle: TextStyle(color: Colors.red.shade700, fontSize: 12),
-                            visualDensity: VisualDensity.compact,
-                          )
-                        : null,
-                    onTap: () async {
-                      await Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (_) => InspectionRunScreen(inspection: i)),
-                      );
-                      _refresh();
-                    },
                   ),
                 );
               },

@@ -80,11 +80,11 @@ class _InspectionRunScreenState extends State<InspectionRunScreen> {
   Color _statusColor(ItemStatus s) {
     switch (s) {
       case ItemStatus.pass:
-        return Colors.green;
+        return const Color(0xFF3E7C59);
       case ItemStatus.fail:
-        return Colors.red;
+        return const Color(0xFFC7402D);
       case ItemStatus.na:
-        return Colors.grey;
+        return Colors.grey.shade400;
     }
   }
 
@@ -93,46 +93,110 @@ class _InspectionRunScreenState extends State<InspectionRunScreen> {
     final subtitleParts = [_inspection.clientName, _inspection.propertyAddress]
         .where((s) => s.isNotEmpty)
         .join(' · ');
+    final total = _inspection.items.length;
+    final completed = _inspection.items.where((i) => i.status != ItemStatus.na).length;
+    final failed = _inspection.items.where((i) => i.status == ItemStatus.fail).length;
+
     return Scaffold(
       appBar: AppBar(title: Text(_inspection.templateName)),
       body: ListView(
         padding: const EdgeInsets.all(12),
         children: [
           if (subtitleParts.isNotEmpty) ...[
-            Text(subtitleParts, style: const TextStyle(color: Colors.grey)),
-            const SizedBox(height: 12),
+            Text(subtitleParts, style: TextStyle(color: Colors.grey.shade600)),
+            const SizedBox(height: 8),
           ],
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(14),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text('$completed of $total reviewed',
+                          style: Theme.of(context).textTheme.titleMedium),
+                      if (failed > 0)
+                        Text('$failed failed',
+                            style: TextStyle(
+                                color: Colors.red.shade600,
+                                fontWeight: FontWeight.w600,
+                                fontSize: 13)),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(8),
+                    child: LinearProgressIndicator(
+                      value: total == 0 ? 0 : completed / total,
+                      minHeight: 8,
+                      backgroundColor: Colors.grey.shade200,
+                      valueColor: AlwaysStoppedAnimation(Theme.of(context).colorScheme.primary),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 12),
           for (int i = 0; i < _inspection.items.length; i++)
             Card(
               margin: const EdgeInsets.symmetric(vertical: 4),
-              child: Padding(
-                padding: const EdgeInsets.all(8),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+              clipBehavior: Clip.antiAlias,
+              child: IntrinsicHeight(
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    Text(_inspection.items[i].label,
-                        style: const TextStyle(fontWeight: FontWeight.w600)),
-                    const SizedBox(height: 4),
-                    Wrap(
-                      spacing: 8,
-                      children: ItemStatus.values.map((s) {
-                        final selected = _inspection.items[i].status == s;
-                        return ChoiceChip(
-                          label: Text(s.name.toUpperCase()),
-                          selected: selected,
-                          selectedColor: _statusColor(s).withOpacity(0.25),
-                          onSelected: (_) {
-                            setState(() => _inspection.items[i].status = s);
-                            _persist();
-                          },
-                        );
-                      }).toList(),
-                    ),
-                    TextField(
-                      decoration: const InputDecoration(hintText: 'Add a note (optional)'),
-                      controller: _noteControllers[i],
-                      onChanged: (v) => _inspection.items[i].note = v,
-                      onEditingComplete: _persist,
+                    Container(width: 5, color: _statusColor(_inspection.items[i].status)),
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.all(12),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(_inspection.items[i].label,
+                                style: Theme.of(context).textTheme.titleMedium),
+                            const SizedBox(height: 8),
+                            Wrap(
+                              spacing: 8,
+                              children: ItemStatus.values.map((s) {
+                                final selected = _inspection.items[i].status == s;
+                                final color = _statusColor(s);
+                                return ChoiceChip(
+                                  label: Text(
+                                    s.name.toUpperCase(),
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.w700,
+                                      fontSize: 12,
+                                      color: selected ? color : Colors.grey.shade700,
+                                    ),
+                                  ),
+                                  selected: selected,
+                                  showCheckmark: false,
+                                  backgroundColor: Colors.grey.shade100,
+                                  selectedColor: color.withOpacity(0.14),
+                                  side: BorderSide(
+                                    color: selected ? color : Colors.grey.shade300,
+                                    width: selected ? 1.4 : 1,
+                                  ),
+                                  onSelected: (_) {
+                                    setState(() => _inspection.items[i].status = s);
+                                    _persist();
+                                  },
+                                );
+                              }).toList(),
+                            ),
+                            const SizedBox(height: 8),
+                            TextField(
+                              decoration: const InputDecoration(hintText: 'Add a note (optional)'),
+                              controller: _noteControllers[i],
+                              onChanged: (v) => _inspection.items[i].note = v,
+                              onEditingComplete: _persist,
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
                   ],
                 ),
@@ -144,7 +208,7 @@ class _InspectionRunScreenState extends State<InspectionRunScreen> {
               Expanded(
                 child: OutlinedButton.icon(
                   onPressed: _addPhoto,
-                  icon: const Icon(Icons.add_a_photo),
+                  icon: const Icon(Icons.add_a_photo_outlined),
                   label: Text('Photos (${_inspection.photoPaths.length})'),
                 ),
               ),
@@ -152,7 +216,7 @@ class _InspectionRunScreenState extends State<InspectionRunScreen> {
               Expanded(
                 child: OutlinedButton.icon(
                   onPressed: _addSignature,
-                  icon: const Icon(Icons.draw),
+                  icon: const Icon(Icons.draw_outlined),
                   label: Text(_inspection.signaturePath == null ? 'Signature' : 'Signed ✓'),
                 ),
               ),
@@ -168,7 +232,7 @@ class _InspectionRunScreenState extends State<InspectionRunScreen> {
                     .map((p) => Padding(
                           padding: const EdgeInsets.only(right: 8),
                           child: ClipRRect(
-                            borderRadius: BorderRadius.circular(6),
+                            borderRadius: BorderRadius.circular(10),
                             child: Image.file(File(p), width: 80, height: 80, fit: BoxFit.cover),
                           ),
                         ))
@@ -181,7 +245,7 @@ class _InspectionRunScreenState extends State<InspectionRunScreen> {
             onPressed: _generating ? null : _generateReport,
             icon: _generating
                 ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2))
-                : const Icon(Icons.picture_as_pdf),
+                : const Icon(Icons.picture_as_pdf_outlined),
             label: const Text('Generate PDF Report'),
           ),
         ],
